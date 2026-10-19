@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="CaboLeon: reggaetón y perreo entre Toulouse y Cabo. Nuevo sencillo Bailamos Cabron el 23 de octubre.">
+<meta name="description" content="CaboLeon: reggaetón y perreo entre Toulouse y Cabo.">
 <link rel="preload" as="image" href="img/bailamos.webp">
 <title>CaboLeon Oficial</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -163,7 +163,7 @@ footer{padding-block:36px 56px;border-top:1px solid var(--line);color:var(--mute
       <div class="cover" id="cover"><img id="coverimg" src="img/bailamos.webp" alt="Portada de Bailamos Cabron: CaboLeon en el centro de una discoteca llena, con una bola de disco y el título escrito en el humo"></div>
       <div>
         <span class="tag" id="tag">Nuevo sencillo</span>
-        <h1><span class="l">BAILAMOS</span><br><em class="l" style="animation-delay:.15s">CABRON</em></h1>
+        <h1><span class="l" id="t1">BAILAMOS</span><br><em class="l" id="t2" style="animation-delay:.15s">CABRON</em></h1>
         <p class="date" id="date">Viernes <b>23 de octubre</b> · <b>12:00 AM</b> en todas las plataformas</p>
         <div class="count" id="count" aria-live="polite">
           <div><b id="d">0</b><small>días</small></div>
@@ -207,7 +207,7 @@ footer{padding-block:36px 56px;border-top:1px solid var(--line);color:var(--mute
         </a>
         <a class="song reveal" href="https://distrokid.com/hyperfollow/caboleon/tragos-y-humo" target="_blank" rel="noopener">
           <div class="art"><img decoding="async" width="480" height="480" src="img/tragos.webp" alt="Portada de Tragos y Humo: CaboLeon en un club lleno de humo con el título escrito en el humo"></div>
-          <span class="badge">Nuevo</span>
+          <span class="badge" id="badge2">Próximamente</span>
           <h3>TRAGOS Y HUMO</h3>
           <p>Noche loca, humo y tequila</p>
         </a>
@@ -254,9 +254,25 @@ footer{padding-block:36px 56px;border-top:1px solid var(--line);color:var(--mute
 
 <script>
 (function(){
-  var target = new Date(2026, 9, 23, 0, 0, 0).getTime();
+  // Calendario: el sencillo destacado arriba cambia solo a partir de su fecha "from"
+  var RELEASES=[
+    {from:new Date(2026,0,1), date:new Date(2026,9,23,0,0,0), t1:'BAILAMOS', t2:'CABRON', img:'img/bailamos.webp',
+     label:'Viernes <b>23 de octubre</b> · <b>12:00 AM</b>', link:'https://distrokid.com/hyperfollow/caboleon/bailamos-cabron', badge:'badge'},
+    {from:new Date(2026,10,16,0,0,0), date:new Date(2026,10,16,0,0,0), t1:'TRAGOS', t2:'Y HUMO', img:'img/tragos.webp',
+     label:'<b>16 de noviembre</b> · <b>12:00 AM</b>', link:'https://distrokid.com/hyperfollow/caboleon/tragos-y-humo', badge:'badge2'}
+  ];
   function $(id){return document.getElementById(id)}
   function pad(n){return n<10?'0'+n:''+n}
+  var now=Date.now(), cur=RELEASES[0];
+  RELEASES.forEach(function(r){ if(now>=r.from.getTime()) cur=r; });
+  // badges de la lista
+  RELEASES.forEach(function(r){ var b=$(r.badge); if(b) b.textContent = now>=r.date.getTime() ? 'Nuevo' : (r.date.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][r.date.getMonth()]); });
+  if(cur!==RELEASES[0]){
+    $('t1').textContent=cur.t1; $('t2').textContent=cur.t2;
+    $('coverimg').src=cur.img; $('coverimg').alt='Portada de '+cur.t1+' '+cur.t2;
+    $('cta').href=cur.link;
+  }
+  var target=cur.date.getTime();
   function tick(){
     var left = target - Date.now();
     if(left <= 0){
@@ -264,9 +280,10 @@ footer{padding-block:36px 56px;border-top:1px solid var(--line);color:var(--mute
       $('tag').textContent = 'Lo último';
       $('date').innerHTML = '<b>¡Ya disponible!</b> en todas las plataformas';
       $('cta').textContent = '▶ Escuchar ahora';
-      $('badge').textContent = 'Nuevo';
+      var b=$(cur.badge); if(b) b.textContent='Nuevo';
       return;
     }
+    $('date').innerHTML = cur.label + ' en todas las plataformas';
     var s = Math.floor(left/1000);
     $('d').textContent = Math.floor(s/86400);
     $('h').textContent = pad(Math.floor(s%86400/3600));
