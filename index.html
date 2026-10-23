@@ -133,10 +133,25 @@ h2 span{color:var(--pink)}
 .arrow.prev{left:max(4px,calc(50% - var(--cs) / 2 - 76px))}.arrow.next{right:max(4px,calc(50% - var(--cs) / 2 - 76px))}
 .wcount{position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:12px;letter-spacing:.3em;color:var(--mute);font-variant-numeric:tabular-nums}
 .wcount b{color:var(--ink)}
-/* entrada en las canciones: humo que se disipa (solo transform/opacity, una sola vez) */
-.smoke{position:absolute;inset:-10% -20%;z-index:30;pointer-events:none;opacity:0}
-.smoke i{position:absolute;width:70%;aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,rgba(235,220,255,.55),rgba(190,140,255,.22) 45%,transparent 72%)}
-.smoke i:nth-child(1){left:-5%;top:10%}.smoke i:nth-child(2){left:35%;top:-5%;background:radial-gradient(closest-side,rgba(255,200,235,.5),rgba(255,46,136,.18) 45%,transparent 72%)}.smoke i:nth-child(3){left:20%;top:30%}
+/* entrada en las canciones: humo gris real (textura) que se disipa, una sola vez */
+.smoke{position:absolute;inset:-25% -45%;z-index:30;pointer-events:none;opacity:0}
+.smoke i{position:absolute;width:85%;aspect-ratio:3/2;background:url("img/smoke.webp") center/contain no-repeat}
+.smoke i:nth-child(1){left:-8%;top:18%}.smoke i:nth-child(2){left:30%;top:5%}.smoke i:nth-child(3){left:12%;top:38%}.smoke i:nth-child(4){left:40%;top:40%}
+.in .smoke{animation:smokein 3.4s ease-out forwards}
+.in .smoke i:nth-child(1){animation:drift1 3.4s ease-out forwards}.in .smoke i:nth-child(2){animation:drift2 3.4s ease-out forwards}.in .smoke i:nth-child(3){animation:drift3 3.4s ease-out forwards}.in .smoke i:nth-child(4){animation:drift4 3.4s ease-out forwards}
+@keyframes smokein{0%{opacity:0}12%{opacity:1}45%{opacity:.95}100%{opacity:0}}
+@keyframes drift1{from{transform:translate(18%,12%) scale(.8) rotate(-6deg)}to{transform:translate(-30%,-18%) scale(1.45) rotate(8deg)}}
+@keyframes drift2{from{transform:translate(-5%,20%) scale(.85) rotate(5deg)}to{transform:translate(32%,-28%) scale(1.5) rotate(-10deg)}}
+@keyframes drift3{from{transform:translate(5%,0) scale(.75)}to{transform:translate(-20%,22%) scale(1.6) rotate(6deg)}}
+@keyframes drift4{from{transform:translate(-10%,0) scale(.8)}to{transform:translate(25%,20%) scale(1.55) rotate(-6deg)}}
+/* niebla baja que se queda bajo los álbumes (se mueve muy lento) */
+.fog{position:absolute;z-index:15;left:-30%;right:-30%;top:calc(var(--cs) * .58);height:calc(var(--cs) * .5);pointer-events:none;overflow:hidden;opacity:.75;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)}
+.fog i{position:absolute;inset:0 auto 0 0;width:200%;background:url("img/fog.webp") 0 50%/50% 100% repeat-x;animation:fog 38s linear infinite}
+.fog i+i{opacity:.6;animation-duration:60s;animation-direction:reverse;top:12%}
+@keyframes fog{to{transform:translateX(-50%)}}
+.pre .fog{opacity:0}.in .fog{animation:fogin 2s ease .6s both}
+@keyframes fogin{from{opacity:0}to{opacity:.75}}
 .pre .set,.pre .arrow,.pre .wcount{opacity:0}
 .in .set,.in .wcount{animation:wheelin 1.2s cubic-bezier(.2,.85,.25,1) .35s both}
 .in .arrow{animation:fadein .8s ease .9s both}
@@ -238,7 +253,8 @@ footer{padding-block:36px 56px;border-top:1px solid var(--line);color:var(--mute
       <div class="wheel" id="wheel" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="Mis canciones">
       <button class="arrow prev" id="wprev" type="button" aria-label="Canción anterior">←</button>
       <button class="arrow next" id="wnext" type="button" aria-label="Canción siguiente">→</button>
-      <div class="smoke" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="smoke" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="fog" aria-hidden="true"><i></i><i></i></div>
       <div class="set" id="set">
         <a class="song next" href="https://distrokid.com/hyperfollow/caboleon/tragos-y-humo" target="_blank" rel="noopener">
           <div class="art"><img decoding="async" width="480" height="480" src="img/tragos.webp" alt="Portada de Tragos y Humo: CaboLeon en un club lleno de humo con el título escrito en el humo"></div>
