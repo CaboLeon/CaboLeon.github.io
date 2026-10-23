@@ -146,12 +146,30 @@ h2 span{color:var(--pink)}
 @keyframes drift4{from{transform:translate(-10%,0) scale(.8)}to{transform:translate(25%,20%) scale(1.55) rotate(-6deg)}}
 /* niebla baja que se queda bajo los álbumes (se mueve muy lento) */
 .fog{position:absolute;z-index:15;left:-30%;right:-30%;top:calc(var(--cs) * .58);height:calc(var(--cs) * .5);pointer-events:none;overflow:hidden;opacity:.75;
-  -webkit-mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)}
+  -webkit-mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent),linear-gradient(180deg,transparent,#000 30%,#000 62%,transparent);-webkit-mask-composite:source-in;mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent),linear-gradient(180deg,transparent,#000 30%,#000 62%,transparent);mask-composite:intersect}
 .fog i{position:absolute;inset:0 auto 0 0;width:200%;background:url("img/fog.webp") 0 50%/50% 100% repeat-x;animation:fog 38s linear infinite}
 .fog i+i{opacity:.6;animation-duration:60s;animation-direction:reverse;top:12%}
 @keyframes fog{to{transform:translateX(-50%)}}
 .pre .fog{opacity:0}.in .fog{animation:fogin 2s ease .6s both}
-@keyframes fogin{from{opacity:0}to{opacity:.75}}
+@keyframes fogin{from{opacity:0}to{opacity:.9}}
+/* rayos de luz de club detrás de los álbumes (solo rotación lenta) */
+.beams{position:absolute;inset:-20px -10% 30% -10%;z-index:0;pointer-events:none;-webkit-mask:linear-gradient(180deg,transparent,#000 8%,#000 70%,transparent);mask:linear-gradient(180deg,transparent,#000 8%,#000 70%,transparent)}
+.beams i{position:absolute;top:0;width:clamp(160px,40vw,360px);margin-left:calc(clamp(160px,40vw,360px) / -2);height:150%;transform-origin:50% 0;filter:blur(10px);will-change:transform;
+  -webkit-mask:linear-gradient(90deg,transparent 10%,#000 45%,#000 55%,transparent 90%);mask:linear-gradient(90deg,transparent 10%,#000 45%,#000 55%,transparent 90%);
+  animation:sweep 7s ease-in-out infinite alternate}
+.beams i:nth-child(1){--b:rgba(160,90,255,.9);left:14%;--r0:-28deg;--r1:-8deg}
+.beams i:nth-child(2){--b:rgba(255,45,85,.85);left:78%;--r0:26deg;--r1:6deg;animation-duration:8.5s}
+.beams i:nth-child(3){--b:rgba(235,225,255,.45);left:47%;--r0:-10deg;--r1:12deg;animation-duration:11s;width:clamp(90px,20vw,180px);margin-left:calc(clamp(90px,20vw,180px) / -2)}
+.beams i::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--b) 0%,rgba(0,0,0,0) 80%);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%)}
+@keyframes sweep{from{transform:rotate(var(--r0))}to{transform:rotate(var(--r1))}}
+.pre .beams{opacity:0}.in .beams{animation:fadein 1.6s ease .2s both}
+/* bocanada de humo a cada cambio de canción */
+.puff{position:absolute;z-index:25;left:50%;top:calc(var(--cs) * .25);width:calc(var(--cs) * 1.9);aspect-ratio:3/2;margin-left:calc(var(--cs) * -.95);pointer-events:none;opacity:0;background:url("img/smoke.webp") center/contain no-repeat}
+.puff.go{animation:puff 1.5s ease-out}
+.puff.r{transform:scaleX(-1)}
+@keyframes puff{0%{opacity:0;transform:translateY(25%) scale(.55)}20%{opacity:.95}100%{opacity:0;transform:translateY(-12%) scale(1.25)}}
+.puff.r.go{animation-name:puffr}
+@keyframes puffr{0%{opacity:0;transform:scaleX(-1) translateY(25%) scale(.55)}20%{opacity:.95}100%{opacity:0;transform:scaleX(-1) translateY(-12%) scale(1.25)}}
 .pre .set,.pre .arrow,.pre .wcount{opacity:0}
 .in .set,.in .wcount{animation:wheelin 1.2s cubic-bezier(.2,.85,.25,1) .35s both}
 .in .arrow{animation:fadein .8s ease .9s both}
@@ -254,6 +272,8 @@ footer{padding-block:36px 56px;border-top:1px solid var(--line);color:var(--mute
       <button class="arrow prev" id="wprev" type="button" aria-label="Canción anterior">←</button>
       <button class="arrow next" id="wnext" type="button" aria-label="Canción siguiente">→</button>
       <div class="smoke" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="beams" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="puff" id="puff" aria-hidden="true"></div>
       <div class="fog" aria-hidden="true"><i></i><i></i></div>
       <div class="set" id="set">
         <a class="song next" href="https://distrokid.com/hyperfollow/caboleon/tragos-y-humo" target="_blank" rel="noopener">
@@ -370,7 +390,8 @@ footer{padding-block:36px 56px;border-top:1px solid var(--line);color:var(--mute
       });
       $('wcount').innerHTML='<b>'+(at+1)+'</b> / '+n;
     }
-    function go(d){ at=((at+d)%n+n)%n; lay(); }
+    var puff=$('puff');
+    function go(d){ at=((at+d)%n+n)%n; lay(); if(puff){ puff.classList.remove('go'); puff.classList.toggle('r',d<0); void puff.offsetWidth; puff.classList.add('go'); } }
     $('wprev').addEventListener('click',function(){go(-1)});
     $('wnext').addEventListener('click',function(){go(1)});
     wheel.addEventListener('keydown',function(e){ if(e.key==='ArrowLeft'){go(-1);e.preventDefault()} if(e.key==='ArrowRight'){go(1);e.preventDefault()} });
